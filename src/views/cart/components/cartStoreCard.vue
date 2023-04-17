@@ -2,7 +2,11 @@
   <div class="cart-store-card">
     <div class="store-card-header">
       <div class="store-card-header-title">
-        <nut-checkbox icon-size="20px" v-model:model-value="storeSelected"/>
+        <nut-checkbox
+            icon-size="20px"
+            :model-value="computedStoreSelected"
+            @change="storeSelectChange($event, props.cartStoreInfo)"
+        />
         <span style="line-height: 20px; font-size: 14px; font-weight: bold">
           {{ cartStoreInfo?.storeName }}
         </span>
@@ -18,27 +22,66 @@
         </van-tag>
       </div>
     </div>
-    <div v-for="(item, index) in cartStoreInfo?.cartPreferentialInfos" :key="index">
-      <cart-store-preferential-card :cart-preferential-info="item"></cart-store-preferential-card>
-      <van-divider v-if="index !== cartStoreInfo?.length"></van-divider>
+    <div v-for="(item, index) in cartStoreInfo?.cartPreferentialInfos" :key="item.preferentialId">
+      <cart-store-preferential-card :cart-preferential-info="item"
+                                    @skuSelectChange="skuSelectChange"
+                                    @skuNumChange="skuNumChange"
+      >
+      </cart-store-preferential-card>
+      <van-divider v-if="index !== cartStoreInfo?.cartPreferentialInfos.length - 1"></van-divider>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import {useRouter} from "vue-router";
 import CartStorePreferentialCard from "@/views/cart/components/cartStorePreferentialCard.vue";
+import {CartSelectReq, CartStoreInfo, SkuNumUpdateReq} from "@/api/cart/cart";
 
 const router = useRouter();
-const storeSelected = ref(false);
 const value = ref(1);
 
-defineProps({
+const props = defineProps({
   cartStoreInfo: {
-    type: Object
+    type: Object as () => CartStoreInfo
   }
 })
+
+
+const emits = defineEmits(
+    ['cartSelectChange', 'skuNumChange']
+)
+
+const computedStoreSelected = computed(() => {
+  return !props.cartStoreInfo?.cartPreferentialInfos
+      .find((item) => item.cartSkuInfos
+          .find((subItem) => !subItem.cartInfo.selected));
+})
+
+const storeSelectChange = (state: boolean, cartStoreInfo: CartStoreInfo) => {
+  let cartIds: string[] = [];
+  cartStoreInfo.cartPreferentialInfos.forEach((item) => {
+    item.cartSkuInfos.forEach((subItem) => {
+      cartIds.push(subItem.cartInfo.cartId)
+    })
+  })
+
+  const params: CartSelectReq = {
+    actionType: state ? '1' : '0',
+    cartIds: cartIds
+  }
+  emits('cartSelectChange', params);
+}
+
+const skuSelectChange = (params: CartSelectReq) => {
+  emits('cartSelectChange', params);
+}
+
+const skuNumChange = (params: SkuNumUpdateReq) => {
+  emits('skuNumChange', params);
+}
+
 
 </script>
 

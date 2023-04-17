@@ -46,6 +46,8 @@ export interface CartSkuInfo {
 }
 
 export interface CartPreferentialInfo {
+    preferentialId: string;
+    preferentialType: string;
     preferentialTitle: string;
     cartSkuInfos: CartSkuInfo[];
 }
@@ -56,14 +58,36 @@ export interface CartStoreInfo {
     cartPreferentialInfos: CartPreferentialInfo[]
 }
 
+export interface CartSelectReq {
+    actionType: string;
+    cartIds: string[];
+}
+
+export interface SkuNumUpdateReq {
+    actionType: string;
+    cartId: string;
+}
+
 export function getCartList() {
     return axios.post<HttpResponse<CartStoreInfo[]>>(
         '/api/app/cart/getCartList'
     );
 }
 
-export function addCart(params: {skuId: string, skuNum: number}) {
+export function addCart(params: { skuId: string, skuNum: number }) {
     return axios.post<HttpResponse>(
         '/api/app/cart/addCart', params
+    );
+}
+
+export function selectCart(params: CartSelectReq) {
+    return axios.post<HttpResponse<CartStoreInfo[]>>(
+        '/api/app/cart/selectCart', params
+    );
+}
+
+export function updateSkuNum(params: SkuNumUpdateReq) {
+    return axios.post<HttpResponse<CartStoreInfo[]>>(
+        '/api/app/cart/updateSkuNum', params
     );
 }

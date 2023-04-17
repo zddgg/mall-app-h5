@@ -18,12 +18,23 @@
         </div>
       </div>
     </div>
-    <div v-for="(item, index) in cartDataList" :key="index">
-      <cart-store-card :cart-store-info="item"></cart-store-card>
+    <div v-for="(item, index) in cartDataList" :key="item.storeId">
+      <cart-store-card
+          :cart-store-info="item"
+          @cartSelectChange="cartSelectChange"
+          @skuNumChange="skuNumChange"
+      >
+      </cart-store-card>
     </div>
   </div>
   <van-submit-bar :price="3050" button-text="提交订单" @submit="onSubmit" style="margin-bottom: 6vh">
-    <nut-checkbox icon-size="20px" v-model:model-value="storeSelected">全选</nut-checkbox>
+    <nut-checkbox
+        icon-size="20px"
+        :model-value="computedAllCartSelected"
+        @change="allCartSelectChange"
+    >
+      全选
+    </nut-checkbox>
     <template v-if="false" #tip>
       你的收货地址不支持配送, <span @click="onClickLink">修改地址</span>
     </template>
@@ -32,11 +43,11 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import TabBar from '@/components/TabBar/index.vue'
 import {useRouter} from "vue-router";
 import CartStoreCard from "@/views/cart/components/cartStoreCard.vue";
-import {CartStoreInfo, getCartList} from "@/api/cart/cart";
+import {CartSelectReq, CartStoreInfo, getCartList, selectCart, SkuNumUpdateReq, updateSkuNum} from "@/api/cart/cart";
 
 const router = useRouter();
 const storeSelected = ref(false);
@@ -62,6 +73,28 @@ const queryCartList = async () => {
 onMounted(() => {
   queryCartList();
 })
+
+const cartSelectChange = async (params: CartSelectReq) => {
+  const {data} = await selectCart(params);
+  cartDataList.value = data;
+}
+
+const skuNumChange = async (params: SkuNumUpdateReq) => {
+  const {data} = await updateSkuNum(params);
+  cartDataList.value = data;
+}
+
+const computedAllCartSelected = computed(() => {
+  return !cartDataList.value
+      .find((item1) => item1.cartPreferentialInfos
+          .find((item2) => item2.cartSkuInfos
+              .find((item3) => !item3.cartInfo.selected)))
+})
+
+const allCartSelectChange = async (state: boolean) => {
+  const {data} = await selectCart({actionType: state ? '3' : '2', cartIds: []});
+  cartDataList.value = data;
+}
 </script>
 
 <style scoped>
