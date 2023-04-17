@@ -13,13 +13,32 @@
       </span>
     </div>
     <div class="cart-store-card-sku" style="margin-top: 15px; display: flex"
-         v-for="(item, index) in cartPreferentialInfo?.cartSkuInfos" :key="index">
+         v-for="(item, index) in cartPreferentialInfo?.cartSkuInfos" :key="item.cartInfo.cartId">
       <div class="cart-store-card-sku-image" style="display: flex; height: 100px">
-        <nut-checkbox icon-size="20px" v-model:model-value="item.cartInfo.selected"/>
-        <van-image
-            :src="item.skuInfo.thumbnail"
-            :height="100"
-            :width="100"/>
+        <nut-checkbox
+            icon-size="20px"
+            v-model:model-value="item.cartInfo.selected"
+            @change="skuSelectChange($event, item)"
+        />
+        <div>
+          <div>
+            <van-image
+                :src="item.skuInfo.thumbnail"
+                :height="100"
+                :width="100"/>
+          </div>
+          <div style="margin-top: 6px">
+                <span style="color: #f9411f;
+                              font-size: 14px;
+                              font-weight: bold;
+                              height: 24px;
+                              line-height: 24px"
+                >
+                  <nut-price :price="item.skuInfo.retailPrice"></nut-price>
+                </span>
+
+          </div>
+        </div>
       </div>
       <div class="cart-store-card-sku-content" style="margin-left: 10px">
         <div class="van-multi-ellipsis--l2" style="font-size: 12px; font-weight: 500; letter-spacing: 1px">
@@ -69,20 +88,16 @@
         </div>
         <div style="margin-top: 10px; display: flex; justify-content: space-between; height: 24px">
           <div>
-                <span style="color: #f9411f;
-                              font-size: 14px;
-                              font-weight: bold;
-                              height: 24px;
-                              line-height: 24px"
-                >
-                  <nut-price :price="item.skuInfo.retailPrice"></nut-price>
-                </span>
-
+            <span style="font-size: 12px; color: red; height: 24px; line-height: 24px">限购2件</span>
           </div>
-          <div>
-            <!--            <span style="font-size: 12px; color: red">限购2件</span>-->
-            <van-stepper input-width="32px" button-size="24px" style="margin-left: 4px"
+          <div style="float: right">
+            <van-stepper input-width="32px"
+                         button-size="24px"
+                         style="margin-left: 4px"
                          v-model="item.cartInfo.skuNum"
+                         @plus="skuNumChange(item.cartInfo.cartId, '1')"
+                         @minus="skuNumChange(item.cartInfo.cartId, '0')"
+                         disable-input
             />
           </div>
         </div>
@@ -94,7 +109,7 @@
 <script lang="ts" setup>
 import {ref} from "vue";
 import {useRouter} from "vue-router";
-import {it} from "node:test";
+import {CartPreferentialInfo, CartSelectReq, CartSkuInfo, SkuNumUpdateReq} from "@/api/cart/cart";
 
 const router = useRouter();
 const storeSelected = ref(false);
@@ -105,9 +120,29 @@ const showSku = ref(false);
 
 defineProps({
   cartPreferentialInfo: {
-    type: Object
+    type: Object as () => CartPreferentialInfo
   }
 })
+
+const emits = defineEmits(
+    ['skuSelectChange', 'skuNumChange']
+)
+
+const skuSelectChange = (state: boolean, cartSkuInfo: CartSkuInfo) => {
+  const params: CartSelectReq = {
+    actionType: state ? '1' : '0',
+    cartIds: [cartSkuInfo.cartInfo.cartId]
+  };
+  emits('skuSelectChange', params);
+}
+
+const skuNumChange = async (cartId: string, actionType: string) => {
+  const params: SkuNumUpdateReq = {
+    actionType: actionType,
+    cartId: cartId,
+  }
+  emits('skuNumChange', params)
+}
 
 </script>
 
