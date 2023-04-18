@@ -4,7 +4,7 @@
       <van-cell class="custom-cell"
                 is-link
                 :border="false"
-                @click="showSku = true">
+                @click="skuSelectionShow = true">
         <template #title>
           选择
         </template>
@@ -17,7 +17,7 @@
       <van-cell class="custom-cell"
                 is-link
                 :border="false"
-                @click="showAddressSelect = true">
+                @click="addressSelectShow = true">
         <template #title>
           送至
         </template>
@@ -30,7 +30,7 @@
       <van-cell class="custom-cell"
                 is-link
                 :border="false"
-                @click="showAddressSelect = true">
+                @click="addressSelectShow = true">
         <template #title>
           活动
         </template>
@@ -41,7 +41,7 @@
       </van-cell>
     </van-cell-group>
     <sku-action
-        :show="showSku"
+        :show="skuSelectionShow"
         :sku="skuData.sku"
         :goods="skuData.goods"
         :btnOptions="['buy', 'cart']"
@@ -51,7 +51,7 @@
     >
     </sku-action>
     <nut-address
-        :visible="showAddressSelect"
+        :visible="addressSelectShow"
         type="exist"
         :exist-address="existAddress"
         :province="address.province"
@@ -69,7 +69,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, reactive, ref} from "vue";
+import {onMounted, reactive, ref, watch} from "vue";
 import {skuData} from "@/mock/mock";
 import {Goods, querySkuAttrOptions, SkuAttrMap, SkuAttrOption} from "@/api/product/goods";
 import SkuAction from '@/components/SkuAction/index.vue'
@@ -78,10 +78,21 @@ import {addCart} from "@/api/cart/cart";
 
 const route = useRoute();
 
-const skuName = ref('已选择：亮黑色，8GB+128GB，4G（有充版）');
-const showSku = ref(false);
+const props = defineProps({
+  skuSelectionShow: {
+    type: Boolean,
+    default: false
+  }
+})
 
-const showAddressSelect = ref(false);
+const skuName = ref('已选择：亮黑色，8GB+128GB，4G（有充版）');
+
+const skuSelectionShow = ref(false);
+onMounted(() => {
+  skuSelectionShow.value = props.skuSelectionShow;
+})
+
+const addressSelectShow = ref(false);
 
 const {skuId} = route.params;
 
@@ -166,7 +177,7 @@ const clickBtnOperate = async (op: { type: string, value: number }) => {
 }
 // 关闭商品规格弹框
 const showSkuClose = () => {
-  showSku.value = false
+  skuSelectionShow.value = false
 }
 
 const address = reactive({
@@ -228,7 +239,7 @@ const backBtnIcon = ref('left')
 const text = ref('选择地址')
 
 const showAddressOther = () => {
-  showAddressSelect.value = true;
+  addressSelectShow.value = true;
 };
 
 const close = val => {
@@ -238,7 +249,7 @@ const close = val => {
   } else {
     text.value = val.data.addressStr;
   }
-  showAddressSelect.value = false
+  addressSelectShow.value = false
 };
 
 const selected = (prevExistAdd: any, nowExistAdd: any, arr: any) => {
@@ -256,14 +267,21 @@ const switchModule = (cal: { type: string; }) => {
 const onChange = (cal: { next: string | number; }) => {
   const name = address[cal.next]
   if (name.length < 1) {
-    showAddressSelect.value = false;
+    addressSelectShow.value = false;
   }
 };
 
 const closeMask = (val: any) => {
-  showAddressSelect.value = false;
+  addressSelectShow.value = false;
   console.log('关闭弹层', val);
 };
+
+watch(
+    () => props.skuSelectionShow,
+    (value) => {
+      skuSelectionShow.value = value;
+    }
+);
 </script>
 
 <style lang="scss" scoped>

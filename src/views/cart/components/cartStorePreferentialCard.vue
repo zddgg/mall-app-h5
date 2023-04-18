@@ -12,22 +12,26 @@
             <van-icon name="arrow"/>
       </span>
     </div>
-    <div class="cart-store-card-sku" style="margin-top: 15px; display: flex"
-         v-for="(item, index) in cartPreferentialInfo?.cartSkuInfos" :key="item.cartInfo.cartId">
-      <div class="cart-store-card-sku-image" style="display: flex; height: 100px">
-        <nut-checkbox
-            icon-size="20px"
-            v-model:model-value="item.cartInfo.selected"
-            @change="skuSelectChange($event, item)"
-        />
-        <div>
-          <div>
-            <van-image
-                :src="item.skuInfo.thumbnail"
-                :height="100"
-                :width="100"/>
-          </div>
-          <div style="margin-top: 6px">
+    <div class="cart-store-card-sku" style="margin-top: 15px"
+         v-for="(item, index) in cartPreferentialInfo?.cartSkuInfos" :key="index"
+    >
+      <van-swipe-cell>
+        <div style="display: flex">
+          <div class="cart-store-card-sku-image" style="display: flex; height: 100px">
+            <nut-checkbox
+                icon-size="20px"
+                v-model:model-value="item.cartInfo.selected"
+                @change="skuSelectChange($event, item)"
+            />
+            <div>
+              <div>
+                <van-image
+                    :src="item.skuInfo.thumbnail"
+                    :height="100"
+                    :width="100"
+                />
+              </div>
+              <div style="margin-top: 6px">
                 <span style="color: #f9411f;
                               font-size: 14px;
                               font-weight: bold;
@@ -36,72 +40,81 @@
                 >
                   <nut-price :price="item.skuInfo.retailPrice"></nut-price>
                 </span>
-
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="cart-store-card-sku-content" style="margin-left: 10px">
-        <div class="van-multi-ellipsis--l2" style="font-size: 12px; font-weight: 500; letter-spacing: 1px">
+          <div class="cart-store-card-sku-content" style="margin-left: 10px"
+               @click="jumpToSkuDetail(item.skuInfo.skuId)"
+          >
+            <div class="van-multi-ellipsis--l2" style="font-size: 12px; font-weight: 500; letter-spacing: 1px">
               <span>
                 {{ item.skuInfo.skuName }}
               </span>
-        </div>
-        <div class="van-multi-ellipsis--l1" style="margin-top: 10px">
+            </div>
+            <div class="van-multi-ellipsis--l1" style="margin-top: 10px">
               <span style="border-radius: 14px ;background-color: #e8e8e8; padding: 0 4px" @click="showSku = true">
                 <span style="font-size: 12px; color: #888888">
                   {{ item.skuInfo.attrStr }}
                 </span>
                 <van-icon name="arrow-down" :size="12" style="margin-left: 2px"/>
               </span>
-        </div>
-        <div style="margin-top: 10px">
-          <van-tag round color="#f9411f">
+            </div>
+            <div style="margin-top: 10px">
+              <van-tag round color="#f9411f">
                 <span>
                   京东超市
                 </span>
-          </van-tag>
-          <van-tag plain type="danger" style="margin-left: 4px">
+              </van-tag>
+              <van-tag plain type="danger" style="margin-left: 4px">
                 <span>
                   15天保价
                 </span>
-          </van-tag>
-        </div>
-        <div style="margin-top: 10px">
-          <van-tag round type="danger"
-                   style="width: 100%; background: linear-gradient(90deg, #fee0e3, #fffefe 100%);">
+              </van-tag>
+            </div>
+            <div style="margin-top: 10px">
+              <van-tag round type="danger"
+                       style="width: 100%; background: linear-gradient(90deg, #fee0e3, #fffefe 100%);">
                 <span style="color: red; font-weight: bold">
                   秒杀
                 </span>
-            <span style="color: red; font-weight: bold; margin-left: 4px">
+                <span style="color: red; font-weight: bold; margin-left: 4px">
                   距结束还剩
                 </span>
-            <van-count-down :time="time" style="margin-left: 4px">
-              <template #default="timeData">
-                <span class="block">{{ timeData.hours }}</span>
-                <span class="colon">:</span>
-                <span class="block">{{ timeData.minutes }}</span>
-                <span class="colon">:</span>
-                <span class="block">{{ timeData.seconds }}</span>
-              </template>
-            </van-count-down>
-          </van-tag>
-        </div>
-        <div style="margin-top: 10px; display: flex; justify-content: space-between; height: 24px">
-          <div>
-            <span style="font-size: 12px; color: red; height: 24px; line-height: 24px">限购2件</span>
+                <van-count-down :time="time" style="margin-left: 4px">
+                  <template #default="timeData">
+                    <span class="block">{{ timeData.hours }}</span>
+                    <span class="colon">:</span>
+                    <span class="block">{{ timeData.minutes }}</span>
+                    <span class="colon">:</span>
+                    <span class="block">{{ timeData.seconds }}</span>
+                  </template>
+                </van-count-down>
+              </van-tag>
+            </div>
+            <div style="margin-top: 10px; display: flex; justify-content: space-between; height: 24px">
+              <div>
+                <span style="font-size: 12px; color: red; height: 24px; line-height: 24px">限购2件</span>
+              </div>
+              <div style="float: right">
+                <van-stepper input-width="32px"
+                             button-size="24px"
+                             style="margin-left: 4px"
+                             v-model="item.cartInfo.skuNum"
+                             @plus="skuNumChange(item.cartInfo.cartId, '1')"
+                             @minus="skuNumChange(item.cartInfo.cartId, '0')"
+                             @overlimit="overLimit"
+                             disable-input
+                />
+              </div>
+            </div>
           </div>
-          <div style="float: right">
-            <van-stepper input-width="32px"
-                         button-size="24px"
-                         style="margin-left: 4px"
-                         v-model="item.cartInfo.skuNum"
-                         @plus="skuNumChange(item.cartInfo.cartId, '1')"
-                         @minus="skuNumChange(item.cartInfo.cartId, '0')"
-                         disable-input
-            />
-          </div>
         </div>
-      </div>
+        <template #right>
+          <van-button square text="删除" type="danger" style="height: 100%;"
+                      @click="skuCartDelete(item.cartInfo.cartId)"
+          />
+        </template>
+      </van-swipe-cell>
     </div>
   </div>
 </template>
@@ -109,10 +122,9 @@
 <script lang="ts" setup>
 import {ref} from "vue";
 import {useRouter} from "vue-router";
-import {CartPreferentialInfo, CartSelectReq, CartSkuInfo, SkuNumUpdateReq} from "@/api/cart/cart";
+import {CartDeleteReq, CartPreferentialInfo, CartSelectReq, CartSkuInfo, SkuNumUpdateReq} from "@/api/cart/cart";
 
 const router = useRouter();
-const storeSelected = ref(false);
 const time = ref(24 * 60 * 60 * 1000);
 const value = ref(1);
 const showSku = ref(false);
@@ -125,7 +137,7 @@ defineProps({
 })
 
 const emits = defineEmits(
-    ['skuSelectChange', 'skuNumChange']
+    ['skuSelectChange', 'skuNumChange', 'skuCartDelete']
 )
 
 const skuSelectChange = (state: boolean, cartSkuInfo: CartSkuInfo) => {
@@ -136,12 +148,33 @@ const skuSelectChange = (state: boolean, cartSkuInfo: CartSkuInfo) => {
   emits('skuSelectChange', params);
 }
 
-const skuNumChange = async (cartId: string, actionType: string) => {
+const skuNumChange = (cartId: string, actionType: string) => {
   const params: SkuNumUpdateReq = {
     actionType: actionType,
     cartId: cartId,
   }
   emits('skuNumChange', params)
+  window.event.stopPropagation();
+}
+
+const skuCartDelete = (cartId: string) => {
+  const params: CartDeleteReq = {
+    cartId: cartId,
+  }
+  emits('skuCartDelete', params)
+}
+
+const jumpToSkuDetail = (skuId: string) => {
+  router.push({
+    name: 'ProductDetail',
+    params: {
+      skuId: skuId
+    }
+  })
+}
+
+const overLimit = () => {
+  window.event.stopPropagation()
 }
 
 </script>
