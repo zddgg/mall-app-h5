@@ -68,6 +68,10 @@ export interface SkuNumUpdateReq {
     cartId: string;
 }
 
+export interface CartDeleteReq {
+    cartId: string;
+}
+
 export function getCartList() {
     return axios.post<HttpResponse<CartStoreInfo[]>>(
         '/api/app/cart/getCartList'
@@ -89,5 +93,11 @@ export function selectCart(params: CartSelectReq) {
 export function updateSkuNum(params: SkuNumUpdateReq) {
     return axios.post<HttpResponse<CartStoreInfo[]>>(
         '/api/app/cart/updateSkuNum', params
+    );
+}
+
+export function deleteCart(params: CartDeleteReq) {
+    return axios.post<HttpResponse<CartStoreInfo[]>>(
+        '/api/app/cart/deleteCart', params
     );
 }

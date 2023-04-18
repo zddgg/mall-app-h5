@@ -1,10 +1,10 @@
 import type {AxiosRequestConfig, AxiosResponse} from 'axios';
 import axios from 'axios';
-import {useUserStore} from '@/store';
 import {getToken} from '@/utils/auth';
 import {HttpResponse} from '@/types/global';
 import {showNotify} from "vant";
-import {useRoute, useRouter} from "vue-router";
+import {useRouter} from "vue-router";
+import {useUserStore} from "@/store";
 
 axios.interceptors.request.use(
     (config: AxiosRequestConfig) => {
@@ -38,13 +38,9 @@ axios.interceptors.response.use(
                 ['50008', '50012', '50014'].includes(res.code) &&
                 response.config.url !== '/api/user/info'
             ) {
-                // const userStore = useUserStore();
-                // userStore.logout();
-                // window.location.reload();
-                console.log('xx')
-                useRouter().push({
-
-                })
+                const userStore = useUserStore();
+                userStore.logout();
+                window.location.reload();
             }
             return Promise.reject(new Error(res.msg || 'Error'));
         }

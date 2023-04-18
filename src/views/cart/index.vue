@@ -18,11 +18,12 @@
         </div>
       </div>
     </div>
-    <div v-for="(item, index) in cartDataList" :key="item.storeId">
+    <div v-for="(item, index) in cartDataList" :key="index">
       <cart-store-card
           :cart-store-info="item"
           @cartSelectChange="cartSelectChange"
           @skuNumChange="skuNumChange"
+          @skuCartDelete="skuCartDelete"
       >
       </cart-store-card>
     </div>
@@ -47,10 +48,18 @@ import {computed, onMounted, ref} from "vue";
 import TabBar from '@/components/TabBar/index.vue'
 import {useRouter} from "vue-router";
 import CartStoreCard from "@/views/cart/components/cartStoreCard.vue";
-import {CartSelectReq, CartStoreInfo, getCartList, selectCart, SkuNumUpdateReq, updateSkuNum} from "@/api/cart/cart";
+import {
+  CartDeleteReq,
+  CartSelectReq,
+  CartStoreInfo,
+  deleteCart,
+  getCartList,
+  selectCart,
+  SkuNumUpdateReq,
+  updateSkuNum
+} from "@/api/cart/cart";
 
 const router = useRouter();
-const storeSelected = ref(false);
 const value = ref(1);
 const showAddressSelect = ref(false);
 
@@ -66,7 +75,6 @@ const onSubmit = () => {
 
 const queryCartList = async () => {
   const {data} = await getCartList();
-  console.log(data)
   cartDataList.value = data;
 }
 
@@ -81,6 +89,11 @@ const cartSelectChange = async (params: CartSelectReq) => {
 
 const skuNumChange = async (params: SkuNumUpdateReq) => {
   const {data} = await updateSkuNum(params);
+  cartDataList.value = data;
+}
+
+const skuCartDelete = async (params: CartDeleteReq) => {
+  const {data} = await deleteCart(params);
   cartDataList.value = data;
 }
 

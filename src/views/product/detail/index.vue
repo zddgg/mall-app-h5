@@ -5,7 +5,7 @@
     <!-- 商品基本信息 -->
     <goods-info></goods-info>
     <!-- 商品属性组 -->
-    <goods-attr-group></goods-attr-group>
+    <goods-attr-group :sku-selection-show="skuSelectionShow"></goods-attr-group>
     <!-- 用户交互 -->
     <user-interaction></user-interaction>
     <!-- 推荐列表 -->
@@ -14,7 +14,7 @@
     <more-detail></more-detail>
   </div>
   <!-- 底部操作 -->
-  <detail-footer></detail-footer>
+  <detail-footer @openSkuSelection="openSkuSelection"></detail-footer>
 </template>
 
 <script lang="ts" setup>
@@ -24,6 +24,14 @@ import MoreDetail from "@/views/product/detail/components/moreDetail.vue";
 import DetailFooter from "@/views/product/detail/components/detailFooter.vue";
 import GoodsAttrGroup from "@/views/product/detail/components/goodsAttrGroup.vue";
 import UserInteraction from "@/views/product/detail/components/userInteraction.vue";
+import {ref} from "vue";
+
+const skuSelectionShow = ref(false);
+
+const openSkuSelection = () => {
+  console.log('11')
+  skuSelectionShow.value = true;
+}
 </script>
 
 <style scoped>

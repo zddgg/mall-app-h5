@@ -22,10 +22,11 @@
         </van-tag>
       </div>
     </div>
-    <div v-for="(item, index) in cartStoreInfo?.cartPreferentialInfos" :key="item.preferentialId">
+    <div v-for="(item, index) in cartStoreInfo?.cartPreferentialInfos" :key="index">
       <cart-store-preferential-card :cart-preferential-info="item"
                                     @skuSelectChange="skuSelectChange"
                                     @skuNumChange="skuNumChange"
+                                    @skuCartDelete="skuCartDelete"
       >
       </cart-store-preferential-card>
       <van-divider v-if="index !== cartStoreInfo?.cartPreferentialInfos.length - 1"></van-divider>
@@ -37,7 +38,7 @@
 import {computed, ref} from "vue";
 import {useRouter} from "vue-router";
 import CartStorePreferentialCard from "@/views/cart/components/cartStorePreferentialCard.vue";
-import {CartSelectReq, CartStoreInfo, SkuNumUpdateReq} from "@/api/cart/cart";
+import {CartDeleteReq, CartSelectReq, CartStoreInfo, SkuNumUpdateReq} from "@/api/cart/cart";
 
 const router = useRouter();
 const value = ref(1);
@@ -50,7 +51,7 @@ const props = defineProps({
 
 
 const emits = defineEmits(
-    ['cartSelectChange', 'skuNumChange']
+    ['cartSelectChange', 'skuNumChange', 'skuCartDelete']
 )
 
 const computedStoreSelected = computed(() => {
@@ -82,7 +83,9 @@ const skuNumChange = (params: SkuNumUpdateReq) => {
   emits('skuNumChange', params);
 }
 
-
+const skuCartDelete = (params: CartDeleteReq) => {
+  emits('skuCartDelete', params);
+}
 </script>
 
 <style scoped>
