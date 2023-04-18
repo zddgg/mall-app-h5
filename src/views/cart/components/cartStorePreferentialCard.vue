@@ -154,7 +154,7 @@ const skuNumChange = (cartId: string, actionType: string) => {
     cartId: cartId,
   }
   emits('skuNumChange', params)
-  window.event.stopPropagation();
+  window.event?.stopPropagation();
 }
 
 const skuCartDelete = (cartId: string) => {
@@ -174,7 +174,7 @@ const jumpToSkuDetail = (skuId: string) => {
 }
 
 const overLimit = () => {
-  window.event.stopPropagation()
+  window.event?.stopPropagation()
 }
 
 </script>
